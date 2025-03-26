@@ -101,14 +101,14 @@ def write_medyolo_yaml(output_base_dir, yaml_path='/home/tarobben/Documents/PFOD
 write_medyolo_yaml("/scratch/tarobben/MedYOLO/Test/")
 
 
-# prepare_medyolo_split(
-#     pfo_image_dir="/scratch/tarobben/PFO_CT/",
-#     pfo_label_dir="/scratch/tarobben/MedYOLO/PFO_labels_MedYOLO/",
-#     no_pfo_image_dir="/scratch/tarobben/NO_PFO_CT/",
-#     no_pfo_label_dir="/scratch/tarobben/MedYOLO/NO_PFO_labels_MedYOLO/",
-#     output_base_dir="/scratch/tarobben/MedYOLO/Test/",
-#     n_pfo_total=18,
-#     n_no_pfo_total=72,
-#     val_ratio=0.2
-# )
+prepare_medyolo_split(
+    pfo_image_dir="/scratch/tarobben/PFO_CT/",
+    pfo_label_dir="/scratch/tarobben/MedYOLO/PFO_labels_MedYOLO/",
+    no_pfo_image_dir="/scratch/tarobben/NO_PFO_CT/",
+    no_pfo_label_dir="/scratch/tarobben/MedYOLO/NO_PFO_labels_MedYOLO/",
+    output_base_dir="/scratch/tarobben/MedYOLO/Test/",
+    n_pfo_total=18,
+    n_no_pfo_total=72,
+    val_ratio=0.2
+)
 

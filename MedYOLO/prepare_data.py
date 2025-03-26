@@ -78,69 +78,106 @@ def check_nifti_sizes(nifti_folder):
             print(f"   - Full size (mm): Z={Z_total:.2f}, X={X_total:.2f}, Y={Y_total:.2f}\n")
 
 
+import os
+import json
+import nibabel as nib
+import numpy as np
+
+import os
+import json
+import nibabel as nib
+import numpy as np
+
 def convert_json_to_medyolo(nifti_folder, json_folder, output_folder):
     """
-    Reads JSON files corresponding to NIfTI images, normalizes the bounding box data, 
-    and saves them in MedYOLO label format.
-
-    Args:
-        nifti_folder (str): Path to the folder containing NIfTI (.nii.gz) files.
-        json_folder (str): Path to the folder containing corresponding JSON (.json) files.
-        output_folder (str): Path where the MedYOLO labels (.txt) will be saved.
+    Reads JSON files corresponding to NIfTI images, normalizes the bounding box data using
+    physical coordinates from affine matrix (with full volume corner checking), and saves them in MedYOLO label format.
     """
 
     if not os.path.exists(output_folder):
-        os.makedirs(output_folder)  # Create output folder if it doesn't exist
+        os.makedirs(output_folder)
 
     for nifti_file in os.listdir(nifti_folder):
-        if nifti_file.endswith(".nii.gz"):  # Process only NIfTI files
-            patient_id = nifti_file.replace("_70.nii.gz", "")  # Extract patient ID
-            json_file = f"{patient_id}_70.json"  # Expected JSON filename
-            json_path = os.path.join(json_folder, json_file)
-            nifti_path = os.path.join(nifti_folder, nifti_file)
+        if not nifti_file.endswith(".nii.gz"):
+            continue
 
-            if not os.path.exists(json_path):
-                print(f"❌ JSON file missing for {nifti_file}, skipping...")
-                continue
+        patient_id = nifti_file.replace("_70.nii.gz", "")
+        json_file = f"{patient_id}_70.json"
+        nifti_path = os.path.join(nifti_folder, nifti_file)
+        json_path = os.path.join(json_folder, json_file)
 
-            # Load NIfTI file to get image dimensions
-            nifti = nib.load(nifti_path)
-            shape = nifti.shape  # (Z, X, Y)
-            voxel_size = nifti.header.get_zooms()  # (Z, X, Y) voxel size in mm
+        if not os.path.exists(json_path):
+            print(f"❌ JSON file missing for {nifti_file}, skipping...")
+            continue
 
-            # Compute full image dimensions in mm
-            Z_total = shape[0] * voxel_size[0]
-            X_total = shape[1] * voxel_size[1]
-            Y_total = shape[2] * voxel_size[2]
+        # Load NIfTI and compute volume bounds
+        nifti = nib.load(nifti_path)
+        shape = nifti.shape
+        affine = nifti.affine
 
-            # Load JSON file
-            with open(json_path, "r") as file:
-                data = json.load(file)
+        # Compute 8 corners in mm space
+        corners_vox = np.array([
+            [0, 0, 0],
+            [0, 0, shape[2]-1],
+            [0, shape[1]-1, 0],
+            [0, shape[1]-1, shape[2]-1],
+            [shape[0]-1, 0, 0],
+            [shape[0]-1, 0, shape[2]-1],
+            [shape[0]-1, shape[1]-1, 0],
+            [shape[0]-1, shape[1]-1, shape[2]-1],
+        ])
+        corners_mm = nib.affines.apply_affine(affine, corners_vox)
+        Z_min, X_min, Y_min = corners_mm.min(axis=0)
+        Z_max, X_max, Y_max = corners_mm.max(axis=0)
 
-            if "center" not in data or "size" not in data:
-                print(f"❌ Missing center or size in {json_file}, skipping...")
-                continue
+        # Load JSON
+        with open(json_path, "r") as file:
+            data = json.load(file)
 
-            center = data["center"]  # Center in mm (Z, X, Y)
-            size = data["size"]  # Size in mm (Z-Length, X-Length, Y-Length)
+        if "center" not in data or "size" not in data:
+            print(f"❌ Missing center or size in {json_file}, skipping...")
+            continue
 
-            # Normalize coordinates
-            Z_Center = max(-0.5, min(1.5, center[0] / Z_total))
-            X_Center = max(-0.5, min(1.5, center[1] / X_total))
-            Y_Center = max(-0.5, min(1.5, center[2] / Y_total))
+        # Convert LPS → RAS
+        center_lps = data["center"]
+        center_ras = [-center_lps[0], -center_lps[1], center_lps[2]]
+        size = data["size"]
 
-            Z_Length = size[0] / Z_total
-            X_Length = size[1] / X_total
-            Y_Length = size[2] / Y_total
+        # Normalize center using real bounds
+        Z_Center = (center_ras[0] - Z_min) / (Z_max - Z_min)
+        X_Center = (center_ras[1] - X_min) / (X_max - X_min)
+        Y_Center = (center_ras[2] - Y_min) / (Y_max - Y_min)
 
-            # Save in MedYOLO format
-            medyolo_label = f"1 {Z_Center:.6f} {X_Center:.6f} {Y_Center:.6f} {Z_Length:.6f} {X_Length:.6f} {Y_Length:.6f}\n"
-            output_txt_path = os.path.join(output_folder, f"{patient_id}_70.txt")
+        if not (-0.5 <= Z_Center <= 1.5 and -0.5 <= X_Center <= 1.5 and -0.5 <= Y_Center <= 1.5):
+            print(f"⚠️ Skipping {json_file} due to out-of-range normalized center: "
+                  f"Z={Z_Center:.2f}, X={X_Center:.2f}, Y={Y_Center:.2f}")
+            continue
 
-            with open(output_txt_path, "w") as txt_file:
-                txt_file.write(medyolo_label)
+        # Normalize size
+        Z_Length = size[0] / (Z_max - Z_min)
+        X_Length = size[1] / (X_max - X_min)
+        Y_Length = size[2] / (Y_max - Y_min)
 
-            print(f"✅ Converted {json_file} → {output_txt_path}")
+        # Save label
+        label_str = f"1 {Z_Center:.6f} {X_Center:.6f} {Y_Center:.6f} {Z_Length:.6f} {X_Length:.6f} {Y_Length:.6f}\n"
+        output_txt_path = os.path.join(output_folder, f"{patient_id}_70.txt")
+
+        with open(output_txt_path, "w") as txt_file:
+            txt_file.write(label_str)
+
+        print(f"✅ Converted {json_file} → {output_txt_path}")
+
+
+# Run the function with your paths
+convert_json_to_medyolo(
+    nifti_folder="/scratch/tarobben/PFO_CT/",
+    json_folder="/scratch/tarobben/MedYOLO/PFO_labels_annotated/",
+    output_folder="/scratch/tarobben/MedYOLO/PFO_labels_MedYOLO/"
+)
+
+# check_nifti_sizes("/scratch/tarobben/PFO_CT/")  # Change to your actual folder path
+# clean_json_files("/scratch/tarobben/MedYOLO/All_data_formatted/")  # Change this to the actual folder path
+# rename_json_files("/scratch/tarobben/MedYOLO/All_data_formatted/")  # Change this to the actual folder path
 
 
 # ====================================================================================================================================
@@ -224,10 +261,10 @@ def create_no_pfo_labels(nifti_folder, label_output_folder):
             print(f"✅ Created label file: {label_filename}")
 
 
-create_no_pfo_labels(
-    nifti_folder="/scratch/tarobben/NO_PFO_CT/",  # Folder containing copied "No PFO" images
-    label_output_folder="/scratch/tarobben/MedYOLO/NO_PFO_labels_MedYOLO/"  # Folder to save the labels
-)
+# create_no_pfo_labels(
+#     nifti_folder="/scratch/tarobben/NO_PFO_CT/",  # Folder containing copied "No PFO" images
+#     label_output_folder="/scratch/tarobben/MedYOLO/NO_PFO_labels_MedYOLO/"  # Folder to save the labels
+# )
 
 # copy_no_pfo_nifti(
 #     xlsx_path="/scratch/tarobben/MTHdata_imagingID_with_scans.xlsx",
@@ -235,11 +272,3 @@ create_no_pfo_labels(
 #     output_folder="/scratch/tarobben/NO_PFO_CT/",
 #     column_name="CTA_HEART_PFO"  # Adjust to match the column in your CSV
 # )
-# convert_json_to_medyolo(
-#     nifti_folder="/scratch/tarobben/PFO_CT/",
-#     json_folder="/scratch/tarobben/MedYOLO/PFO_labels_annotated/",
-#     output_folder="/scratch/tarobben/MedYOLO/PFO_labels_MedYOLO/"
-# )
-# check_nifti_sizes("/scratch/tarobben/PFO_CT/")  # Change to your actual folder path
-# clean_json_files("/scratch/tarobben/MedYOLO/All_data_formatted/")  # Change this to the actual folder path
-# rename_json_files("/scratch/tarobben/MedYOLO/All_data_formatted/")  # Change this to the actual folder path
