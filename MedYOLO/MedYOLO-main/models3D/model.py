@@ -278,7 +278,7 @@ class Detect(nn.Module):
     def _make_grid(self, nz=20, nx=20, ny=20, i=0):
         # i is the detection layer index
         d = self.anchors[i].device
-        zv, yv, xv = torch.meshgrid([torch.arange(nz).to(d), torch.arange(ny).to(d), torch.arange(nx).to(d)], indexing='ij')
+        zv, yv, xv = torch.meshgrid([torch.arange(nz).to(d), torch.arange(ny).to(d), torch.arange(nx).to(d)])
         grid = torch.stack((zv, xv, yv), 3).expand((1, self.na, nz, ny, nx, 3)).float()
         anchor_grid = (self.anchors[i].clone() * self.stride[i]) \
             .view((1, self.na, 1, 1, 1, 3)).expand((1, self.na, nz, ny, nx, 3)).float()
