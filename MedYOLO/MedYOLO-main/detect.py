@@ -99,7 +99,7 @@ def run(weights,  # model.pt path(s)
         
         # Inference
         pred = model(img)[0]
-
+        print(pred)
         # NMS
         pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, multi_label=True, max_det=max_det)
         

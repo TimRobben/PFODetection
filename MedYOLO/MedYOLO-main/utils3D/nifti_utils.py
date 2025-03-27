@@ -151,6 +151,8 @@ def mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
         max_y = min(height, max_y)
         min_x = max(0, min_x)
         max_x = min(width, max_x)
+        print(f"Center (vox): Z={z_center:.2f}, X={x_center:.2f}, Y={y_center:.2f}")
+        print(f"Box range (vox): Z=({min_z}, {max_z}), X=({min_x}, {max_x}), Y=({min_y}, {max_y})")
 
         mask_array[min_x:max_x+1, min_y:max_y+1, min_z:max_z+1] = 1
         

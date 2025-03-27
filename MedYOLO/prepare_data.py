@@ -101,8 +101,8 @@ def convert_json_to_medyolo(nifti_folder, json_folder, output_folder):
         if not nifti_file.endswith(".nii.gz"):
             continue
 
-        patient_id = nifti_file.replace("_70.nii.gz", "")
-        json_file = f"{patient_id}_70.json"
+        patient_id = nifti_file.replace(".nii.gz", "")
+        json_file = f"{patient_id}.json"
         nifti_path = os.path.join(nifti_folder, nifti_file)
         json_path = os.path.join(json_folder, json_file)
 
@@ -138,15 +138,13 @@ def convert_json_to_medyolo(nifti_folder, json_folder, output_folder):
             print(f"❌ Missing center or size in {json_file}, skipping...")
             continue
 
-        # Convert LPS → RAS
-        center_lps = data["center"]
-        center_ras = [-center_lps[0], -center_lps[1], center_lps[2]]
+        center = data["center"]
         size = data["size"]
 
         # Normalize center using real bounds
-        Z_Center = (center_ras[0] - Z_min) / (Z_max - Z_min)
-        X_Center = (center_ras[1] - X_min) / (X_max - X_min)
-        Y_Center = (center_ras[2] - Y_min) / (Y_max - Y_min)
+        Z_Center = (center[0] - Z_min) / (Z_max - Z_min)
+        X_Center = (center[1] - X_min) / (X_max - X_min)
+        Y_Center = (center[2] - Y_min) / (Y_max - Y_min)
 
         if not (-0.5 <= Z_Center <= 1.5 and -0.5 <= X_Center <= 1.5 and -0.5 <= Y_Center <= 1.5):
             print(f"⚠️ Skipping {json_file} due to out-of-range normalized center: "
@@ -160,7 +158,7 @@ def convert_json_to_medyolo(nifti_folder, json_folder, output_folder):
 
         # Save label
         label_str = f"1 {Z_Center:.6f} {X_Center:.6f} {Y_Center:.6f} {Z_Length:.6f} {X_Length:.6f} {Y_Length:.6f}\n"
-        output_txt_path = os.path.join(output_folder, f"{patient_id}_70.txt")
+        output_txt_path = os.path.join(output_folder, f"{patient_id}.txt")
 
         with open(output_txt_path, "w") as txt_file:
             txt_file.write(label_str)
