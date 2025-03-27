@@ -306,10 +306,10 @@ class LoadNiftisAndLabels(Dataset):
         # ratio = (1, 1, 1) # no letterboxing so the shape doesn't change and the ratios are all 1
         pad = (0, 0, 0) # shape not changing so not padding any side
         shapes = (d0, h0, w0), ((d/d0, h/h0, w/w0), pad)
-
+    
         labels = self.labels[self.indices[index]].copy()
-        nl = len(labels)  # number of labels
 
+        nl = len(labels)  # number of labels
         if self.augment:           
             # Label transformation is done to make certain augmentations more straightforward
             if labels.size:  # normalized zxydwh to pixel zxyzxy format
@@ -334,6 +334,7 @@ class LoadNiftisAndLabels(Dataset):
             img, labels = tensor_cutout(img, labels, self.hyp['cutout_params'], self.hyp['prob_cutout'])
             # update after cutout
             nl = len(labels)  # number of labels
+
         
         labels_out = torch.zeros((nl, 8))
         if nl:

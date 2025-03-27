@@ -248,6 +248,7 @@ def train(hyp, opt, device, callbacks):
             # Forward
             with amp.autocast(enabled=cuda):
                 pred = model(imgs)  # forward
+                
                 loss, loss_items = compute_loss(pred, targets.to(device).float())  # loss scaled by batch_size
                 del pred
 

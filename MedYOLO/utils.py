@@ -162,4 +162,72 @@ def check_label_center_inside_volume(json_folder, nifti_folder):
     print(f"Total cases outside volume: {len(outside_cases)}")
 
 
-check_label_center_inside_volume("/scratch/tarobben/MedYOLO/PFO_labels_annotated/", "/scratch/tarobben/PFO_CT/")
+#check_label_center_inside_volume("/scratch/tarobben/MedYOLO/PFO_labels_annotated/", "/scratch/tarobben/PFO_CT/")
+    
+import os
+
+# Updated version of the function to handle '.nii.gz' files with '.nii' prefix properly
+def validate_label_files(image_folder, label_folder, class_count=2):
+    """
+    Improved validation to handle .nii.gz images and match labels accordingly.
+    """
+    issues = []
+
+    # Map without extension to actual image file
+    image_files = {}
+    for f in os.listdir(image_folder):
+        if f.endswith(".nii.gz"):
+            base = f
+            if base.endswith(".nii.gz"):
+                base = base.replace(".nii.gz", "")
+            image_files[base] = f
+    print(image_files)
+
+    label_files = [f for f in os.listdir(label_folder) if f.endswith(".txt")]
+
+    for label_file in label_files:
+        patient_id = os.path.splitext(label_file)[0]
+        label_path = os.path.join(label_folder, label_file)
+
+        # Check image match
+        if patient_id not in image_files:
+            issues.append(f"❌ No matching image for label file: {label_file}")
+            continue
+
+        # Read label file
+        with open(label_path, "r") as f:
+            lines = f.readlines()
+
+        if not lines:
+            continue  # Empty file is valid for "no object"
+
+        for i, line in enumerate(lines):
+            parts = line.strip().split()
+            if len(parts) != 7:
+                issues.append(f"❌ Malformed line in {label_file} (line {i+1}): expected 7 elements, got {len(parts)}")
+                continue
+
+            try:
+                class_id = int(parts[0])
+                if not (0 <= class_id < class_count):
+                    issues.append(f"❌ Invalid class ID in {label_file} (line {i+1}): {class_id}")
+                coords = list(map(float, parts[1:]))
+                for j, c in enumerate(coords[:3]):  # Center values
+                    if not (-0.5 <= c <= 1.5):
+                        issues.append(f"❌ Center coord out of range in {label_file} (line {i+1}): {coords}")
+            except ValueError:
+                issues.append(f"❌ Non-numeric value in {label_file} (line {i+1})")
+
+    if not issues:
+        print("✅ All label files passed validation!")
+    else:
+        print("⚠️ Issues found:")
+        for issue in issues:
+            print(issue)
+
+
+
+validate_label_files(
+    image_folder="/scratch/tarobben/MedYOLO/Test/images/val",
+    label_folder="/scratch/tarobben/MedYOLO/Test/labels/val"
+)
