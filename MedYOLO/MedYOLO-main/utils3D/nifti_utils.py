@@ -111,7 +111,7 @@ def mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
     """
     f = open(bbox_path, 'r')
     label = list(filter(None, f.read().split('\n'))) # filtering out blank lines
-    
+    print(label)
     # load nifti and create empty mask
     nifti = nib.load(nifti_path)
     mask_array = np.zeros_like(np.array(nifti.dataobj))
@@ -120,7 +120,7 @@ def mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
     height = mask_array.shape[0]
     width = mask_array.shape[1]           
     depth = mask_array.shape[2]
-    
+    print(width,height,depth)
     for target in label:
         cls, z, x, y, d, w, h = target.split(' ')
         cls = int(cls)
