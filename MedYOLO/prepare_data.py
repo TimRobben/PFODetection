@@ -1,6 +1,7 @@
 import os
 import json 
-import nibabel as nib
+import numpy as np
+# import nibabel as nib
 
 def rename_json_files(json_folder):
     """
@@ -10,12 +11,12 @@ def rename_json_files(json_folder):
 
     # List all files in the directory
     for filename in os.listdir(json_folder):
-        if filename.endswith(".mrk.json"):  # Only process .mrk.json files
+        if filename.endswith("_70_70.mrk_70.mrk.json"):  # Only process .mrk.json files
             # Extract patient number (everything before .mrk.json)
-            patient_number = filename.replace(".mrk.json", "")
+            patient_number = filename.replace("_70_70.mrk_70.mrk.json", "")
 
             # New filename
-            new_filename = f"{patient_number}_70.json"
+            new_filename = f"{patient_number}_70.mrk.json"
             old_path = os.path.join(json_folder, filename)
             new_path = os.path.join(json_folder, new_filename)
 
@@ -23,6 +24,7 @@ def rename_json_files(json_folder):
             os.rename(old_path, new_path)
             print(f"✅ Renamed: {filename} -> {new_filename}")
 
+rename_json_files("/scratch/tarobben/PFO_labels_complete/")  # Change this to the actual folder path
 
 def clean_json_files(json_folder):
     """
@@ -77,16 +79,6 @@ def check_nifti_sizes(nifti_folder):
             print(f"   - Voxel size (mm): {voxel_size}")
             print(f"   - Full size (mm): Z={Z_total:.2f}, X={X_total:.2f}, Y={Y_total:.2f}\n")
 
-
-import os
-import json
-import nibabel as nib
-import numpy as np
-
-import os
-import json
-import nibabel as nib
-import numpy as np
 
 def convert_json_to_medyolo(nifti_folder, json_folder, output_folder):
     """
@@ -182,11 +174,11 @@ def convert_json_to_medyolo(nifti_folder, json_folder, output_folder):
 
 
 # Run the function with your paths
-convert_json_to_medyolo(
-    nifti_folder="/scratch/tarobben/PFO_CT/",
-    json_folder="/scratch/tarobben/MedYOLO/PFO_labels_annotated/",
-    output_folder="/scratch/tarobben/MedYOLO/PFO_labels_MedYOLO/"
-)
+# convert_json_to_medyolo(
+#     nifti_folder="/scratch/tarobben/PFO_CT/",
+#     json_folder="/scratch/tarobben/MedYOLO/PFO_labels_annotated/",
+#     output_folder="/scratch/tarobben/MedYOLO/PFO_labels_MedYOLO/"
+# )
 
 # check_nifti_sizes("/scratch/tarobben/PFO_CT/")  # Change to your actual folder path
 # clean_json_files("/scratch/tarobben/MedYOLO/All_data_formatted/")  # Change this to the actual folder path

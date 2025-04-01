@@ -144,7 +144,7 @@ def mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
         max_x = int(math.ceil(x_center + x_length / 2))
         min_y = int(math.floor(y_center - y_length / 2))
         max_y = int(math.ceil(y_center + y_length / 2))
-
+        print(z_length, x_length, y_length)
         min_z = max(0, min_z)
         max_z = min(depth, max_z)
         min_y = max(0, min_y)
