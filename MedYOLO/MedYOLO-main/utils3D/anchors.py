@@ -70,7 +70,7 @@ def nifti_check_anchors(dataset, model, thr=4.0, imgsz=default_size):
     print('')  # newline
 
 
-def nifti_kmean_anchors(dataset='./data/example.yaml', n=9, img_size=default_size, thr=4.0, gen=1000, verbose=True):
+def nifti_kmean_anchors(dataset='./data/Test.yaml', n=9, img_size=default_size, thr=4.0, gen=1000, verbose=True):
     """ Creates kmeans-evolved anchors from training dataset using niftis
 
             Arguments:

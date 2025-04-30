@@ -312,7 +312,7 @@ def run(cfg,
     data_info = cfg["data"]
 
     if cfg["prep"]["crop"]:
-        # crop data to nonzero area
+        # crop data to nonzero area 
         run_cropping_and_convert(cropped_output_dir=Path(cfg["host"]["cropped_output_dir"]),
                                  splitted_4d_output_dir=Path(cfg["host"]["splitted_4d_output_dir"]),
                                  data_info=data_info,

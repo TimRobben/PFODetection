@@ -20,6 +20,7 @@ import yaml
 from torch.cuda import amp
 from torch.optim import Adam, SGD, lr_scheduler
 from tqdm import tqdm
+# os.nice(10)
 
 # set path for local imports
 FILE = Path(__file__).resolve()
@@ -248,7 +249,8 @@ def train(hyp, opt, device, callbacks):
             # Forward
             with amp.autocast(enabled=cuda):
                 pred = model(imgs)  # forward
-                
+                # print("TARGET SHAPE:", targets.shape)
+
                 loss, loss_items = compute_loss(pred, targets.to(device).float())  # loss scaled by batch_size
                 del pred
 

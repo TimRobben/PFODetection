@@ -1,0 +1,20 @@
+/home/tarobben/.conda/envs/nndet_venv/lib/python3.8/site-packages/torch/autocast_mode.py:162: UserWarning: User provided device_type of 'cuda', but CUDA is not available. Disabling
+  warnings.warn('User provided device_type of \'cuda\', but CUDA is not available. Disabling')
+Traceback (most recent call last):
+  File "/home/tarobben/.conda/envs/nndet_venv/bin/nndet_train", line 33, in <module>
+    sys.exit(load_entry_point('nndet', 'console_scripts', 'nndet_train')())
+  File "/home/tarobben/Documents/PFODetection/nnDetection/nnDetection-main/nndet/utils/check.py", line 62, in wrapper
+    return func(*args, **kwargs)
+  File "/home/tarobben/Documents/PFODetection/nnDetection/nnDetection-main/scripts/train.py", line 70, in train
+    _train(
+  File "/home/tarobben/Documents/PFODetection/nnDetection/nnDetection-main/scripts/train.py", line 181, in _train
+    cfg = compose(task, "config.yaml", overrides=ov if ov is not None else [])
+  File "/home/tarobben/Documents/PFODetection/nnDetection/nnDetection-main/nndet/utils/config.py", line 62, in compose
+    task_name = get_task(task, name=True, models=models)
+  File "/home/tarobben/Documents/PFODetection/nnDetection/nnDetection-main/nndet/io/paths.py", line 208, in get_task
+    all_tasks = [d.stem for d in det_data.iterdir() if d.is_dir() and "Task" in d.name]
+  File "/home/tarobben/Documents/PFODetection/nnDetection/nnDetection-main/nndet/io/paths.py", line 208, in <listcomp>
+    all_tasks = [d.stem for d in det_data.iterdir() if d.is_dir() and "Task" in d.name]
+  File "/home/tarobben/.conda/envs/nndet_venv/lib/python3.8/pathlib.py", line 1122, in iterdir
+    for name in self._accessor.listdir(self):
+FileNotFoundError: [Errno 2] No such file or directory: '/home/tarobben/data'

@@ -82,7 +82,7 @@ def overfit():
     annotated_images = [img for img in data["images"] if img["id"] in image_ids_with_anns]
 
     # Sample 10 examples
-    sampled_images = random.sample(annotated_images, 10)
+    sampled_images = random.sample(annotated_images, 1)
     sampled_ids = set(img["id"] for img in sampled_images)
 
     sampled_anns = [ann for ann in data["annotations"] if ann["image_id"] in sampled_ids]
@@ -93,7 +93,7 @@ def overfit():
         "categories": data["categories"]
     }
 
-    with open("/home/tarobben/scratch/RCNN/output_pfo/pfo_tiny.json", "w") as f:
+    with open("/home/tarobben/scratch/RCNN/output_pfo/pfo_single.json", "w") as f:
         json.dump(mini_data, f, indent=4)
 
 overfit()

@@ -24,7 +24,7 @@ def rename_json_files(json_folder):
             os.rename(old_path, new_path)
             print(f"✅ Renamed: {filename} -> {new_filename}")
 
-rename_json_files("/scratch/tarobben/PFO_labels_complete/")  # Change this to the actual folder path
+# rename_json_files("/scratch/tarobben/PFO_labels_complete/")  # Change this to the actual folder path
 
 def clean_json_files(json_folder):
     """
@@ -33,7 +33,7 @@ def clean_json_files(json_folder):
     """
 
     for filename in os.listdir(json_folder):
-        if filename.endswith("_70.json"):  # Only process renamed JSON files
+        if filename.endswith("_70.mrk.json") or filename.endswith("_0000.mrk.json"):  # Only process renamed JSON files
             json_path = os.path.join(json_folder, filename)
 
             # Load the original JSON file
@@ -55,6 +55,7 @@ def clean_json_files(json_folder):
 
                 print(f"✅ Cleaned: {filename}")
 
+clean_json_files("/home/tarobben/scratch/MedYOLO/PFO_labels_annotated/")  # Change this to the actual folder path
 
 def check_nifti_sizes(nifti_folder):
     """
@@ -181,7 +182,7 @@ def convert_json_to_medyolo(nifti_folder, json_folder, output_folder):
 # )
 
 # check_nifti_sizes("/scratch/tarobben/PFO_CT/")  # Change to your actual folder path
-# clean_json_files("/scratch/tarobben/MedYOLO/All_data_formatted/")  # Change this to the actual folder path
+
 # rename_json_files("/scratch/tarobben/MedYOLO/All_data_formatted/")  # Change this to the actual folder path
 
 
@@ -235,7 +236,7 @@ def copy_no_pfo_nifti(xlsx_path, nifti_folder, output_folder, column_name, sheet
             print(f"✅ Copied: {nifti_filename} → {output_folder}")
     print(missing_files)
 
-import os
+
 
 def create_no_pfo_labels(nifti_folder, label_output_folder):
     """

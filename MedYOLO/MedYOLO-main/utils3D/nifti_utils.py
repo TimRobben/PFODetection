@@ -46,7 +46,7 @@ def multilabel_mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
     nifti = nib.load(nifti_path)
     nifti_array = np.array(nifti.dataobj)
     # mask_array = np.zeros_like(nifti_array)
-
+    
     # might need to flip order of height and width...
     height = nifti_array.shape[0]
     width = nifti_array.shape[1]
@@ -111,7 +111,7 @@ def mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
     """
     f = open(bbox_path, 'r')
     label = list(filter(None, f.read().split('\n'))) # filtering out blank lines
-    print(label)
+    
     # load nifti and create empty mask
     nifti = nib.load(nifti_path)
     mask_array = np.zeros_like(np.array(nifti.dataobj))
@@ -120,7 +120,7 @@ def mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
     height = mask_array.shape[0]
     width = mask_array.shape[1]           
     depth = mask_array.shape[2]
-    print(width,height,depth)
+    
     for target in label:
         cls, z, x, y, d, w, h = target.split(' ')
         cls = int(cls)
@@ -144,15 +144,13 @@ def mask_maker(bbox_path: str, nifti_path: str, mask_path: str):
         max_x = int(math.ceil(x_center + x_length / 2))
         min_y = int(math.floor(y_center - y_length / 2))
         max_y = int(math.ceil(y_center + y_length / 2))
-        print(z_length, x_length, y_length)
+
         min_z = max(0, min_z)
         max_z = min(depth, max_z)
         min_y = max(0, min_y)
         max_y = min(height, max_y)
         min_x = max(0, min_x)
         max_x = min(width, max_x)
-        print(f"Center (vox): Z={z_center:.2f}, X={x_center:.2f}, Y={y_center:.2f}")
-        print(f"Box range (vox): Z=({min_z}, {max_z}), X=({min_x}, {max_x}), Y=({min_y}, {max_y})")
 
         mask_array[min_x:max_x+1, min_y:max_y+1, min_z:max_z+1] = 1
         

@@ -63,8 +63,8 @@ def process_all_ct_scans(ct_folder, ann_folder, output_slices_folder, output_jso
                 roi_plane_min = np.min(corners_world[:, plane_axes], axis=0)
                 roi_plane_max = np.max(corners_world[:, plane_axes], axis=0)
                 # print(center, size, orientation)
-                # print(corners_local)
-                # print(corners_world)
+                print(corners_local)
+                print(corners_world)
                 # print("axis",roi_axis_min,roi_axis_max)
                 print(roi_plane_min,roi_plane_max)
         
@@ -181,10 +181,10 @@ def process_all_ct_scans(ct_folder, ann_folder, output_slices_folder, output_jso
     print(f"Combined COCO JSON saved to {output_json_path}")
 # Example usage:
 if __name__ == "__main__":
-    ct_folder = "/home/tarobben/scratch/PFO_Complete/"         # Folder with complete CT scans (.nii/.nii.gz)
+    ct_folder = "/home/tarobben/scratch/MedYOLO/nifticheck/yolo/"         # Folder with complete CT scans (.nii/.nii.gz)
     ann_folder = "/home/tarobben/scratch/PFO_labels_complete/"     # Folder with corresponding annotation JSON files
-    output_slices_folder = "/home/tarobben/scratch/RCNN/PFO_png/"   # Where subfolders for each CT will be created
-    output_json_path = "/home/tarobben/scratch/RCNN/PFO_png/pfo_coco.json"  # Combined COCO-style JSON file for all slices
+    output_slices_folder = "/home/tarobben/scratch/MedYOLO/nifticheck/yolo/"   # Where subfolders for each CT will be created
+    output_json_path = "/home/tarobben/scratch/MedYOLO/nifticheck/yolo/"  # Combined COCO-style JSON file for all slices
     # slicing_axis: 0 for axial, 1 for coronal, 2 for sagittal (default is 0)
     process_all_ct_scans(ct_folder, ann_folder, output_slices_folder, output_json_path, slicing_axis=2)
 

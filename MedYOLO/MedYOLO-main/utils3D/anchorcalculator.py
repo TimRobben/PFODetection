@@ -38,7 +38,7 @@ def AnchorCalculator(dataset, model, imgsz=default_size, thr=4.0, gen=1000, opt_
     m = model.module.model[-1] if hasattr(model, 'module') else model.model[-1]  # Detect()
     nl = len(m.anchors)
     na = m.anchors.numel() // 3  # total number of anchors, all layers combined
-    #na = 12
+    
     def metric(k, dwh):
         # k is a list of lists with shape [num_anchors, 3]
         # dwh is a tensor of shape [num_labels, 3]
@@ -163,7 +163,6 @@ if __name__=='__main__':
     hyp = ROOT / 'data/hyps/hyp.scratch.yaml'
     with open(hyp, errors='ignore') as f:
         hyp = yaml.safe_load(f)
-
     data = ROOT / 'data/Test.yaml'  # This will need to be replaced with the yaml file for your data
     with open(data, errors='ignore') as f:
         data_dict = yaml.safe_load(f)  # model dict
