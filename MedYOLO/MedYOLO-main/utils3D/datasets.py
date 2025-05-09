@@ -29,6 +29,64 @@ IMG_FORMATS = ['nii', 'nii.gz']  # acceptable image suffixes, note nii.gz compat
 NUM_THREADS = min(8, os.cpu_count())  # number of multiprocessing threads
 default_size = 350 # edge length for testing
 
+# ----------------------------------------------------------------------
+#  BalancedBatchSampler – guarantees ≥1 positive (PFO) sample per batch (custom code)
+# ----------------------------------------------------------------------
+class BalancedBatchSampler(torch.utils.data.Sampler):
+    """
+    Iterates over dataset indices so that each batch contains at least
+    one 'positive' image (here: an image that has ≥1 PFO label).
+    It keeps the original order for the rest of the batch, so the
+    overall ratio inside an epoch is unchanged.
+
+    Args:
+        dataset (LoadNiftisAndLabels): the MedYOLO Dataset
+        batch_size (int): batch size used by the DataLoader
+    """
+    def __init__(self, dataset, batch_size: int):
+        self.dataset     = dataset
+        self.batch_size  = batch_size
+
+        # --- split indices into positive / negative --------------------
+        self.pos_idx = []
+        self.neg_idx = []
+        for idx, lbl in enumerate(dataset.labels):
+            (self.pos_idx if len(lbl) else self.neg_idx).append(idx)
+
+        if len(self.pos_idx) == 0:
+            raise RuntimeError("BalancedBatchSampler: no positive samples!")
+
+        # shuffle each epoch
+        self.gen = torch.Generator()
+
+    def __iter__(self):
+        # fresh permutation every epoch
+        p = torch.randperm(len(self.pos_idx), generator=self.gen).tolist()
+        n = torch.randperm(len(self.neg_idx), generator=self.gen).tolist()
+
+        pos_ptr, neg_ptr = 0, 0
+        while neg_ptr < len(self.neg_idx):
+            # 1. pick one positive
+            if pos_ptr >= len(self.pos_idx):
+                # reshuffle positives when we run out
+                p = torch.randperm(len(self.pos_idx), generator=self.gen).tolist()
+                pos_ptr = 0
+            batch = [self.pos_idx[p[pos_ptr]]]
+            pos_ptr += 1
+
+            # 2. fill remainder with negatives
+            needed = self.batch_size - 1
+            batch += [self.neg_idx[n[i]] for i in range(neg_ptr,
+                                                        min(neg_ptr+needed, len(self.neg_idx)))]
+            neg_ptr += needed
+            yield batch
+
+        # drop_last=True : no partial batch at end
+
+    def __len__(self):
+        # number of complete batches we can generate
+        return len(self.neg_idx) // (self.batch_size - 1)
+
 
 def file_lister_train(parent_dir: List[str], prefix=''):
     """Takes a parent directory or list of parent directories and
@@ -353,6 +411,50 @@ class LoadNiftisAndLabels(Dataset):
         return torch.stack(img, 0), torch.cat(label, 0), path, shapes
 
 
+# def nifti_dataloader(path: str, imgsz: int, batch_size: int, stride: int, single_cls=False, hyp=None, augment=False, pad=0.0,
+#                      rank=-1, workers=8, prefix=''):
+#     """This is the dataloader used in the training process
+#     The same as that of 2D YOLO, just built around a different Dataset definition
+
+#     Args:
+#         path (str): path to the directory containing the training files
+#         imgsz (int): edge length for the cube input will be reshaped to.
+#         batch_size (int): size of the batch to return.
+#         stride (int): model stride, used for resizing and augmentation
+#         hyp (Dict, optional): dictionary containing augmentation configuration hyperparameters. Defaults to None.
+#         augment (bool, optional): whether or not augmentation should be enabled. Defaults to False.
+#         pad (float, optional): image padding, used for resizing and augmentation. Defaults to 0.0.
+#         rank (int, optional): determines whether to use distributed sampling. Defaults to -1.
+#         workers (int, optional): number of dataloader workers. Defaults to 8.
+#         prefix (str, optional): Prefix for error messages. Defaults to ''.
+
+#     Returns:
+#         dataloader: dataloader for training loop
+#         dataset: training dataset
+#     """
+    
+#     with torch_distributed_zero_first(rank):
+#         dataset = LoadNiftisAndLabels(path, imgsz, batch_size,
+#                                       augment=augment,
+#                                       hyp=hyp,
+#                                       # rect=rect,  # rectangular training
+#                                       single_cls=single_cls,
+#                                       stride=stride,
+#                                       pad=pad,
+#                                       prefix=prefix)
+
+#     batch_size = min(batch_size, len(dataset))
+#     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, workers])  # number of workers
+#     sampler = torch.utils.data.distributed.DistributedSampler(dataset) if rank != -1 else None
+#     loader = InfiniteDataLoader
+#     dataloader = loader(dataset,
+#                         batch_size=batch_size,
+#                         num_workers=nw,
+#                         sampler=sampler,
+#                         pin_memory=True, # may need to set False to resolve memory issues
+#                         collate_fn=LoadNiftisAndLabels.collate_fn)
+#     return dataloader, dataset
+
 def nifti_dataloader(path: str, imgsz: int, batch_size: int, stride: int, single_cls=False, hyp=None, augment=False, pad=0.0,
                      rank=-1, workers=8, prefix=''):
     """This is the dataloader used in the training process
@@ -384,17 +486,22 @@ def nifti_dataloader(path: str, imgsz: int, batch_size: int, stride: int, single
                                       stride=stride,
                                       pad=pad,
                                       prefix=prefix)
-
+    if 'val' in path and not augment:          # simple heuristic: val loader gets balanced sampler
+        sampler = BalancedBatchSampler(dataset, batch_size)
+        shuffle = False
+    else:                                      # training loader keeps current behaviour
+        sampler = torch.utils.data.distributed.DistributedSampler(dataset) if rank != -1 else None
+        shuffle = sampler is None
     batch_size = min(batch_size, len(dataset))
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, workers])  # number of workers
-    sampler = torch.utils.data.distributed.DistributedSampler(dataset) if rank != -1 else None
-    loader = InfiniteDataLoader
-    dataloader = loader(dataset,
-                        batch_size=batch_size,
-                        num_workers=nw,
-                        sampler=sampler,
-                        pin_memory=True, # may need to set False to resolve memory issues
-                        collate_fn=LoadNiftisAndLabels.collate_fn)
+    loader_cls = InfiniteDataLoader if (augment or sampler is None) else torch.utils.data.DataLoader
+    dataloader = loader_cls(dataset,
+                            batch_size=batch_size,
+                            sampler=sampler,
+                            shuffle=shuffle,
+                            num_workers=nw,
+                            pin_memory=True,
+                            collate_fn=LoadNiftisAndLabels.collate_fn)
     return dataloader, dataset
 
 

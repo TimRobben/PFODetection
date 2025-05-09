@@ -5,6 +5,8 @@ Example cmd line call: python train.py --data example.yaml --adam
 
 # standard library imports
 import argparse
+import warnings
+warnings.filterwarnings('ignore')
 from copy import deepcopy
 import os
 import random

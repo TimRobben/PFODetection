@@ -25,7 +25,7 @@ def balanced_train_test_split(
     num_pfo_train = len(pfo_files) - num_pfo_test
 
     # Sample matching number of non-PFOs
-    nonpfo_test = random.sample(nonpfo_files, num_pfo_test)
+    nonpfo_test = random.sample(nonpfo_files, num_pfo_test * 16)
     remaining_nonpfo = [f for f in nonpfo_files if f not in nonpfo_test]
     nonpfo_train = random.sample(remaining_nonpfo, num_pfo_train)
 
@@ -66,9 +66,8 @@ def balanced_train_test_split(
     print("[✓] Balanced stratified split done.")
 
 
-# balanced_train_test_split("/scratch/tarobben/PFO_Complete/", "/scratch/tarobben/NO_PFO_CT/", "/scratch/tarobben/nndet/PFO_masks/", "/scratch/tarobben/nndet/Non_PFO_masks/", "/scratch/tarobben/nndet/Task001_test/", test_ratio=0.2)
+# balanced_train_test_split("/scratch/tarobben/PFO_Complete/", "/scratch/tarobben/NO_PFO_CT/", "/scratch/tarobben/nndet/PFO_masks/", "/scratch/tarobben/nndet/Non_PFO_masks/", "/scratch/tarobben/nndet/Task002/", test_ratio=0.2)
 
-import os
 
 def validate_image_label_pairs(images_dir, labels_dir):
     image_files = [f for f in os.listdir(images_dir) if f.endswith("_0000.nii.gz")]
@@ -98,6 +97,6 @@ def validate_image_label_pairs(images_dir, labels_dir):
 
 # Replace these with your actual paths
 validate_image_label_pairs(
-    images_dir="/home/tarobben/scratch/nndet/Task001_test/imagesTs/",
-    labels_dir="/home/tarobben/scratch/nndet/Task001_test/labelsTs/"
+    images_dir="/home/tarobben/scratch/nndet/Task002/raw_splitted/imagesTr/",
+    labels_dir="/home/tarobben/scratch/nndet/Task002/raw_splitted/labelsTr/"
 )

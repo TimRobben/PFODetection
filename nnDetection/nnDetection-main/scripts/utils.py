@@ -61,7 +61,7 @@ def boxes2nii():
     overwrites = overwrites if overwrites is not None else []
     overwrites.append("host.parent_data=${oc.env:det_data}")
     overwrites.append("host.parent_results=${oc.env:det_models}")
-
+    
     prediction_dir = training_dir / "test_predictions" \
         if test else training_dir / "val_predictions"
     save_dir = training_dir / "test_predictions_nii" \

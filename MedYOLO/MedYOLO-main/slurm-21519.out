@@ -1,0 +1,42 @@
+[34m[1mtrain: [0mweights=, cfg=models3D/yolo3D_custom.yaml, data=Test.yaml, hyp=data/hyps/hyp.scratch.yaml, epochs=1000, batch_size=8, imgsz=350, resume=False, nosave=False, noval=False, noautoanchor=False, evolve=None, image_weights=True, device=, single_cls=False, adam=True, workers=8, project=runs/train, name=exp, exist_ok=False, label_smoothing=0.0, patience=200, freeze=0, save_period=-1, local_rank=-1, norm=CT
+Scanning '/scratch/tarobben/MedYOLO/Test/labels/train.cache' images and labels... 128 found, 0 missing, 60 empty, 0 corrupted: 100%|██████████| 128/128 [00:00<?, ?it/s]Scanning '/scratch/tarobben/MedYOLO/Test/labels/train.cache' images and labels... 128 found, 0 missing, 60 empty, 0 corrupted: 100%|██████████| 128/128 [00:00<?, ?it/s]
+Scanning '/scratch/tarobben/MedYOLO/Test/labels/val.cache' images and labels... 64 found, 0 missing, 60 empty, 0 corrupted: 100%|██████████| 64/64 [00:00<?, ?it/s]Scanning '/scratch/tarobben/MedYOLO/Test/labels/val.cache' images and labels... 64 found, 0 missing, 60 empty, 0 corrupted: 100%|██████████| 64/64 [00:00<?, ?it/s]
+
+autoanchor: Analyzing anchors... anchors/target = 6.00, Best Possible Recall (BPR) = 1.0000
+
+     Epoch   gpu_mem       box       obj       cls    labels  img_size
+  0%|          | 0/16 [00:00<?, ?it/s]     0/999     19.3G    0.2676      2.58   0.02757         4       350:   0%|          | 0/16 [01:01<?, ?it/s]     0/999     19.3G    0.2676      2.58   0.02757         4       350:   6%|▋         | 1/16 [01:01<15:22, 61.51s/it]     0/999     20.9G    0.2655     2.586   0.02758         6       350:   6%|▋         | 1/16 [01:10<15:22, 61.51s/it]     0/999     20.9G    0.2655     2.586   0.02758         6       350:  12%|█▎        | 2/16 [01:10<07:06, 30.48s/it]     0/999     27.9G    0.2651     2.589   0.02756         4       350:  12%|█▎        | 2/16 [01:18<07:06, 30.48s/it]     0/999     27.9G    0.2651     2.589   0.02756         4       350:  19%|█▉        | 3/16 [01:18<04:22, 20.16s/it]     0/999     27.9G    0.2645     2.589   0.02755         4       350:  19%|█▉        | 3/16 [01:22<04:22, 20.16s/it]     0/999     27.9G    0.2645     2.589   0.02755         4       350:  25%|██▌       | 4/16 [01:22<02:44, 13.72s/it]     0/999     27.9G    0.2649      2.47   0.02716         4       350:  25%|██▌       | 4/16 [01:25<02:44, 13.72s/it]     0/999     27.9G    0.2649      2.47   0.02716         4       350:  31%|███▏      | 5/16 [01:25<01:49,  9.94s/it]     0/999     27.9G    0.2649     2.312   0.02644         7       350:  31%|███▏      | 5/16 [01:29<01:49,  9.94s/it]     0/999     27.9G    0.2649     2.312   0.02644         7       350:  38%|███▊      | 6/16 [01:29<01:19,  7.91s/it]     0/999     27.9G     0.265     2.146   0.02563         4       350:  38%|███▊      | 6/16 [01:32<01:19,  7.91s/it]     0/999     27.9G     0.265     2.146   0.02563         4       350:  44%|████▍     | 7/16 [01:32<00:57,  6.38s/it]     0/999     27.9G    0.2646     1.988    0.0248         5       350:  44%|████▍     | 7/16 [01:36<00:57,  6.38s/it]     0/999     27.9G    0.2646     1.988    0.0248         5       350:  50%|█████     | 8/16 [01:36<00:44,  5.55s/it]     0/999     27.9G    0.2651     1.841    0.0241         3       350:  50%|█████     | 8/16 [01:47<00:44,  5.55s/it]     0/999     27.9G    0.2651     1.841    0.0241         3       350:  56%|█████▋    | 9/16 [01:47<00:51,  7.34s/it]     0/999     27.9G    0.2651     1.708   0.02324         4       350:  56%|█████▋    | 9/16 [01:50<00:51,  7.34s/it]     0/999     27.9G    0.2651     1.708   0.02324         4       350:  62%|██████▎   | 10/16 [01:50<00:36,  6.06s/it]     0/999     27.9G    0.2651     1.588   0.02242         4       350:  62%|██████▎   | 10/16 [02:07<00:36,  6.06s/it]     0/999     27.9G    0.2651     1.588   0.02242         4       350:  69%|██████▉   | 11/16 [02:07<00:46,  9.28s/it]     0/999     27.9G     0.265      1.48    0.0216         3       350:  69%|██████▉   | 11/16 [02:11<00:46,  9.28s/it]     0/999     27.9G     0.265      1.48    0.0216         3       350:  75%|███████▌  | 12/16 [02:11<00:30,  7.72s/it]     0/999     27.9G    0.2651     1.384   0.02077         2       350:  75%|███████▌  | 12/16 [02:15<00:30,  7.72s/it]     0/999     27.9G    0.2651     1.384   0.02077         2       350:  81%|████████▏ | 13/16 [02:15<00:20,  6.76s/it]     0/999     27.9G    0.2653     1.298   0.01999         5       350:  81%|████████▏ | 13/16 [02:19<00:20,  6.76s/it]     0/999     27.9G    0.2653     1.298   0.01999         5       350:  88%|████████▊ | 14/16 [02:19<00:11,  5.70s/it]     0/999     27.9G    0.2653     1.221   0.01929         6       350:  88%|████████▊ | 14/16 [02:22<00:11,  5.70s/it]     0/999     27.9G    0.2653     1.221   0.01929         6       350:  94%|█████████▍| 15/16 [02:22<00:04,  4.96s/it]     0/999     27.9G    0.2656     1.152   0.01861         3       350:  94%|█████████▍| 15/16 [02:25<00:04,  4.96s/it]     0/999     27.9G    0.2656     1.152   0.01861         3       350: 100%|██████████| 16/16 [02:25<00:00,  4.43s/it]     0/999     27.9G    0.2656     1.152   0.01861         3       350: 100%|██████████| 16/16 [02:25<00:00,  9.10s/it]
+               Class     Images     Labels          P          R     mAP@.5 mAP@.5:.95:   0%|          | 0/1 [00:00<?, ?it/s]               Class     Images     Labels          P          R     mAP@.5 mAP@.5:.95:   0%|          | 0/1 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 526, in <module>
+    main(opt)
+  File "train.py", line 433, in main
+    train(opt.hyp, opt, device, callbacks)
+  File "train.py", line 295, in train
+    results, _, _ = val.run(data_dict,
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/tarobben/Documents/PFODetection/MedYOLO/MedYOLO-main/val.py", line 154, in run
+    for _, (img, targets, paths, shapes) in enumerate(tqdm(dataloader, desc=s)):
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 517, in __next__
+    data = self._next_data()
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1199, in _next_data
+    return self._process_data(data)
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1225, in _process_data
+    data.reraise()
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/_utils.py", line 429, in reraise
+    raise self.exc_type(msg)
+TypeError: Caught TypeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 202, in _worker_loop
+    data = fetcher.fetch(index)
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/tarobben/.conda/envs/medyolo/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 44, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/home/tarobben/Documents/PFODetection/MedYOLO/MedYOLO-main/utils3D/datasets.py", line 361, in __getitem__
+    img, (d0, h0, w0), (d, h, w), _ = self.load_nifti(self.indices[index])
+TypeError: range indices must be integers or slices, not list
+

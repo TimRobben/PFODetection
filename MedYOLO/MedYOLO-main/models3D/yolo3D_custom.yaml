@@ -6,9 +6,9 @@ depth_multiple: 0.33  # model depth multiple
 width_multiple: 0.50  # layer channel multiple
 
 anchors: # depth, width, height of the anchor boxes
-- [23, 17, 33, 24, 15, 39, 21, 16, 45, 23, 18, 37] 
-- [23, 30, 34, 26, 26, 35, 27, 27, 47, 32, 24, 48] 
-- [28, 23, 58, 25, 29, 57, 38, 20, 68, 42, 24, 62]
+- [18, 12,  8,   24, 14, 10]     # small (≈ 5-10 mm range)
+- [26, 18, 12,   32, 20, 15]     # medium
+- [34, 24, 18,   44, 30, 22]     # large (upper 90-th percentile)
 
 
 

@@ -140,7 +140,7 @@ def add_0000(dir):
         else:
             os.rename(old_path, new_path)
             print(f"[✓] Renamed: {fname} → {new_name}")
-# add_0000('/home/tarobben/scratch/nndet/Task001_test/imagesTs/')
+# add_0000('/home/tarobben/scratch/nndet/Task002/raw_splitted/imagesTs/')
 # dir = '/home/tarobben/scratch/nndet/Task001_test/imagesTr/'
 # for fname in os.listdir(dir):
 #     if not fname.endswith("0000.nii.gz"):
